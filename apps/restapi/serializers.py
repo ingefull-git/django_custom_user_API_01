@@ -17,7 +17,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     def save(self, *args, **kwargs):
         try:
             userid = self.data['id']
-        except Exception as e:
+        except:
             userid = None
         if not userid:
             user = CustomUser(
@@ -42,5 +42,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
             user.set_password(password)
             user.save()
             return user
-            
+
+
+class CustomUserLoginSerializer(serializers.ModelSerializer):
+
+    password = serializers.CharField(style={'input_type':'password'}, write_only=True)
+    
+    class Meta:
+        model = CustomUser
+        fields = ('email', 'username', 'password')
 
