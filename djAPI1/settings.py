@@ -147,3 +147,12 @@ REST_FRAMEWORK = {
     # 'DEFAULT_APAGINATION_CLASSE': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 1,
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.AllowAllUsersModelBackend',
+    'apps.customuser.backends.CaseInsensitiveModelBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
+#     'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1

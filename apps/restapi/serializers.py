@@ -1,8 +1,9 @@
 from rest_framework import serializers
 
 from rest_framework.exceptions import ValidationError
-from apps.customuser.models import CustomUser
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class CustomUserSerializer(serializers.ModelSerializer):
 
@@ -10,7 +11,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type':'password'}, write_only=True)
 
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('id', 'email', 'username', 'created', 'login', 'password', 'password2')
 
 
@@ -20,7 +21,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         except:
             userid = None
         if not userid:
-            user = CustomUser(
+            user = User(
                 email = self._validated_data['email'],
                 username = self.validated_data['username'],
             )
@@ -33,8 +34,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
             return user
         else:
             try:
-                user = CustomUser.objects.get(pk=userid)
-            except CustomUser.DoesNotExist:
+                user = User.objects.get(pk=userid)
+            except User.DoesNotExist:
                 user = None
             user.email=self.validated_data['email']
             user.username=self.validated_data['username']
@@ -49,6 +50,6 @@ class CustomUserLoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     
     class Meta:
-        model = CustomUser
+        model = User
         fields = ('email', 'username', 'password')
 
