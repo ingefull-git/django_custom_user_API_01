@@ -7,7 +7,7 @@ class CustomUserAdmin(UserAdmin):
     ordering          = ('-created', 'email',)
     search_fields     = ('email', 'username',)
     list_filter       = ('email', 'username', 'is_admin', 'is_staff', 'is_superuser', 'is_active',)
-    list_display      = ('email', 'username', 'created', 'login', 'is_admin', 'is_staff', 'is_superuser', 'is_active')
+    list_display      = ('id', 'email', 'username', 'created', 'login', 'is_admin', 'is_staff', 'is_superuser', 'is_active')
     readonly_fields   = ('id', 'created', 'login',)
     fieldsets         = (
                             (None, {'fields':('email', 'username','created','login',)}),
