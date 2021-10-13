@@ -1,13 +1,10 @@
-from django.urls import path
+from django.urls import path, include
 
-from apps.restapi import views
+from apps.restapi.customuser import views
 
 app_name = 'restapi'
 
 
 urlpatterns = [
-    path('', views.user_list_api_view, name="api-user-list"),
-    path('register', views.user_register_api_view, name="api-user-register"),
-    path('login', views.user_login_api_view, name="api-user-login"),
-    path('<int:pk>/update', views.user_get_update_api_view, name="api-user-get-put"),
+    path('user/', include('apps.restapi.customuser.urls')),
 ]
