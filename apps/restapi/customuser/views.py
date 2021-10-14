@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 
 from apps.customuser.models import CustomUser
-from apps.restapi.serializers import CustomUserSerializer, CustomUserLoginSerializer
+from apps.restapi.customuser.serializers import CustomUserSerializer, CustomUserLoginSerializer
 
 
 @api_view(['POST',])

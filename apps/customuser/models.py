@@ -1,15 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
+
 class CustomUserManager(BaseUserManager):
     
-    def create_user(self, email, username, password, **other_fields):
+    def create_user(self, email, username, password=None):
         if not email:
-            raise ValueError("Users must have an email")
+            raise ValueError("Users must have an email address")
         user = self.model(
                 email=self.normalize_email(email),
-                username=username,
-                **other_fields
+                username=username
         )
         user.set_password(password)
         user.save()
@@ -25,6 +25,7 @@ class CustomUserManager(BaseUserManager):
         if other_fields.get('is_superuser') is not True:
             raise ValueError("Superuser must have is_superuser=True")
         return self.create_user(email, username, password, **other_fields)
+
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     
@@ -51,4 +52,3 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def has_module_perms(self, app_label):
         return True
-
