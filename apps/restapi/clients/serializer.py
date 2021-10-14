@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from apps.clients.models import Client
 
-class ClientsSerializer(serializers.Serializer):
+class ClientsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Client
