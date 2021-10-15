@@ -11,12 +11,13 @@ from .pagination import CustomLimitPagination, CustomPageNumberPagination
 from .serializer import ClientsSerializer
 
 
-# @api_view(['GET',])
-# # @permission_classes([IsAuthenticated,])
-# def client_list_api_view(request):
-#     clients = Client.objects.all()
-#     serializer = ClientsSerializer(clients, many=True)
-#     return Response(serializer.data)
+@api_view(['GET',])
+# @permission_classes([IsAuthenticated,])
+def client_list_api_view(request):
+    clients = Client.objects.all()
+    serializer = ClientsSerializer(clients, many=True)
+    return Response(serializer.data)
+
 
 class ClientListApiView(generics.ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly,]

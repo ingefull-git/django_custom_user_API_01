@@ -137,8 +137,8 @@ AUTH_USER_MODEL = 'customuser.CustomUser'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-        # 'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
         # 'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -149,6 +149,7 @@ REST_FRAMEWORK = {
     ],
     # 'DEFAULT_APAGINATION_CLASSE': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 1,
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
 AUTHENTICATION_BACKENDS = [
