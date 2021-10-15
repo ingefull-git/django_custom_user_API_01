@@ -1,6 +1,3 @@
-import email
-from ssl import create_default_context
-from unicodedata import name
 from django.db import models
 
 
