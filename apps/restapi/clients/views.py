@@ -1,3 +1,7 @@
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework.parsers import JSONParser
 from rest_framework import generics, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes
@@ -9,6 +13,23 @@ from ...clients.models import Client
 from .pagination import CustomLimitPagination, CustomPageNumberPagination
 
 from .serializer import ClientsSerializer
+
+@api_view(['GET', 'POST'])
+# @csrf_exempt
+def client_list_create_view(request):
+    """
+    List all the clients or create a new client.
+    """
+    if request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = ClientsSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+    clients = Client.objects.all()
+    serializer = ClientsSerializer(clients, many=True)
+    return JsonResponse(serializer.data, safe=False)
 
 
 @api_view(['GET',])
@@ -30,7 +51,7 @@ class ClientListApiView(generics.ListAPIView):
 
 
 @api_view(['GET', 'PUT',])
-def client_get_update_api_view(request, pk):
+def client_retieve_update_api_view(request, pk):
     try:
         client = Client.objects.get(pk=pk)
     except Client.DoesNotExist:
@@ -61,3 +82,27 @@ class ClientRetrieveUpdateApiView(generics.RetrieveUpdateAPIView):
     queryset = Client.objects.all().order_by('-created')
     serializer_class = ClientsSerializer
 
+
+@api_view(['GET', 'PUT', 'DELETE'])
+# @csrf_exempt
+def client_retrieve_update_delete_view(request, pk):
+    """
+    Can retrieve, update and delete client.
+    """
+    try:
+        client = Client.objects.get(pk=pk)
+    except Client.DoesNotExist:
+        return HttpResponse(status=404)
+    if request.method == 'GET':
+        serializer = ClientsSerializer(client)
+        return JsonResponse(serializer.data)
+    elif request.method == 'PUT':
+        data = JSONParser().parse(request)
+        serializer = ClientsSerializer(client, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+    elif request.method == 'DELETE':
+        client.delete()
+        return HttpResponse(status=204)
