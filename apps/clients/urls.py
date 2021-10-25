@@ -1,6 +1,7 @@
 from django.urls import path, include
 from apps.clients import views
 
+
 app_name = 'clients'
 
 urlpatterns = [
