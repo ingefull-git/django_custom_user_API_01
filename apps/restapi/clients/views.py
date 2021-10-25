@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework.parsers import JSONParser
-from rest_framework import generics, status
+from rest_framework import generics, status, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -15,21 +15,26 @@ from .pagination import CustomLimitPagination, CustomPageNumberPagination
 from .serializer import ClientsSerializer
 
 @api_view(['GET', 'POST'])
+@permission_classes([AllowAny,])
 # @csrf_exempt
 def client_list_create_view(request):
     """
     List all the clients or create a new client.
     """
     if request.method == 'POST':
-        data = JSONParser().parse(request)
+        # data = JSONParser().parse(request)
+        data = request.data
         serializer = ClientsSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            # return JsonResponse(serializer.data, status=201)
+            return Response(serializer.data)
+        # return JsonResponse(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     clients = Client.objects.all()
     serializer = ClientsSerializer(clients, many=True)
-    return JsonResponse(serializer.data, safe=False)
+    # return JsonResponse(serializer.data, safe=False)
+    return Response(serializer.data)
 
 
 @api_view(['GET',])
@@ -38,6 +43,33 @@ def client_list_api_view(request):
     clients = Client.objects.all()
     serializer = ClientsSerializer(clients, many=True)
     return Response(serializer.data)
+
+
+class ClientListCreateApiView(generics.GenericAPIView, 
+                                mixins.ListModelMixin, 
+                                mixins.CreateModelMixin,
+                                mixins.UpdateModelMixin,
+                                mixins.RetrieveModelMixin,
+                                mixins.DestroyModelMixin
+                                ):
+    queryset = Client.objects.all()
+    permission_classes = [AllowAny,]
+    serializer_class = ClientsSerializer
+    lookup_field = "id"
+
+    def get(self, request, id=None):
+        if id:
+            return self.retrieve(request)
+        return self.list(request)
+
+    def post(self, request):
+        return self.create(request)
+
+    def put(self, request, id=None):
+        return self.update(request, id)
+    
+    def delete(self, request, id=None):
+        return self.destroy(request, id)
 
 
 class ClientListApiView(generics.ListAPIView):
