@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
 
 from rest_framework.parsers import JSONParser
 from rest_framework import generics, status, mixins
@@ -8,11 +9,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
+from rest_framework import viewsets
 
 from ...clients.models import Client
 from .pagination import CustomLimitPagination, CustomPageNumberPagination
-
-from .serializer import ClientsSerializer
+from .serializer import ClientSerializer
 
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny,])
@@ -22,9 +23,11 @@ def client_list_create_view(request):
     List all the clients or create a new client.
     """
     if request.method == 'POST':
+
         # data = JSONParser().parse(request)
         data = request.data
         serializer = ClientsSerializer(data=data)
+
         if serializer.is_valid():
             serializer.save()
             # return JsonResponse(serializer.data, status=201)
@@ -32,16 +35,18 @@ def client_list_create_view(request):
         # return JsonResponse(serializer.errors, status=400)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     clients = Client.objects.all()
+
     serializer = ClientsSerializer(clients, many=True)
     # return JsonResponse(serializer.data, safe=False)
     return Response(serializer.data)
+
 
 
 @api_view(['GET',])
 # @permission_classes([IsAuthenticated,])
 def client_list_api_view(request):
     clients = Client.objects.all()
-    serializer = ClientsSerializer(clients, many=True)
+    serializer = ClientSerializer(clients, many=True)
     return Response(serializer.data)
 
 
@@ -76,10 +81,49 @@ class ClientListApiView(generics.ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly,]
     authentication_classes = [TokenAuthentication,]
     queryset = Client.objects.all().order_by('-created')
-    serializer_class = ClientsSerializer
+    serializer_class = ClientSerializer
     pagination_class = CustomPageNumberPagination
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['id', 'fname', 'lname', 'email', 'created', 'updated']
+
+
+class ClientViewset(viewsets.ViewSet):
+    def list(self, request):
+        clients = Client.objects.all()
+        serializer = ClientSerializer(clients, many=True)
+        return Response(serializer.data)
+    
+    def create(self, request):
+        serializer = ClientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):
+        # clients = Client.objects.all()
+        client = get_object_or_404(Client, pk=pk)
+        serializer = ClientSerializer(client)
+        return Response(serializer.data)
+    
+    def update(self, request, pk=None):
+        client = get_object_or_404(Client, pk=pk)
+        serializer = ClientSerializer(client, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            request.data['response'] = "updated successfully"
+            return Response(request.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ClientGenericViewset(viewsets.GenericViewSet, mixins.ListModelMixin):
+    serializer_class = ClientSerializer
+    queryset = Client.objects.all()
+
+
+class ClientModelViewset(viewsets.ModelViewSet):
+    serializer_class = ClientSerializer
+    queryset = Client.objects.all()
 
 
 @api_view(['GET', 'PUT',])
@@ -89,10 +133,10 @@ def client_retieve_update_api_view(request, pk):
     except Client.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
-        serializer = ClientsSerializer(client)
+        serializer = ClientSerializer(client)
         return Response(serializer.data)
     elif request.method == 'PUT':
-        serializer = ClientsSerializer(client, data=request.data)
+        serializer = ClientSerializer(client, data=request.data)
         data = {}
         if serializer.is_valid():
             serializer.save()
@@ -112,7 +156,7 @@ def client_retieve_update_api_view(request, pk):
 
 class ClientRetrieveUpdateApiView(generics.RetrieveUpdateAPIView):
     queryset = Client.objects.all().order_by('-created')
-    serializer_class = ClientsSerializer
+    serializer_class = ClientSerializer
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -126,11 +170,11 @@ def client_retrieve_update_delete_view(request, pk):
     except Client.DoesNotExist:
         return HttpResponse(status=404)
     if request.method == 'GET':
-        serializer = ClientsSerializer(client)
+        serializer = ClientSerializer(client)
         return JsonResponse(serializer.data)
     elif request.method == 'PUT':
         data = JSONParser().parse(request)
-        serializer = ClientsSerializer(client, data=data)
+        serializer = ClientSerializer(client, data=data)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data)
