@@ -85,6 +85,11 @@ class ClientGenericViewset(viewsets.GenericViewSet, mixins.ListModelMixin):
     queryset = Client.objects.all()
 
 
+class ClientModelViewset(viewsets.ModelViewSet):
+    serializer_class = ClientSerializer
+    queryset = Client.objects.all()
+
+
 @api_view(['GET', 'PUT',])
 def client_retieve_update_api_view(request, pk):
     try:

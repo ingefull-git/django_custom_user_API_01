@@ -6,7 +6,9 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('list-clients', views.ClientViewset, basename='clients-viewset')
-router.register('listgeneric-clients', views.ClientGenericViewset, basename='clients-generic-viewset')
+router.register('generic-clients', views.ClientGenericViewset, basename='clients-generic-viewset')
+router.register('model-clients', views.ClientModelViewset, basename='clients-model-viewset')
+
 
 urlpatterns = [
     # path('list', views.client_list_api_view),
