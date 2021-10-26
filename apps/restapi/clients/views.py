@@ -26,7 +26,7 @@ def client_list_create_view(request):
 
         # data = JSONParser().parse(request)
         data = request.data
-        serializer = ClientsSerializer(data=data)
+        serializer = ClientSerializer(data=data)
 
         if serializer.is_valid():
             serializer.save()
@@ -36,7 +36,7 @@ def client_list_create_view(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     clients = Client.objects.all()
 
-    serializer = ClientsSerializer(clients, many=True)
+    serializer = ClientSerializer(clients, many=True)
     # return JsonResponse(serializer.data, safe=False)
     return Response(serializer.data)
 
@@ -59,7 +59,7 @@ class ClientListCreateApiView(generics.GenericAPIView,
                                 ):
     queryset = Client.objects.all()
     permission_classes = [AllowAny,]
-    serializer_class = ClientsSerializer
+    serializer_class = ClientSerializer
     lookup_field = "id"
 
     def get(self, request, id=None):
