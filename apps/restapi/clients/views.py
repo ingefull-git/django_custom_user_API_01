@@ -1,3 +1,4 @@
+from cgitb import lookup
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
@@ -10,6 +11,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework.views import APIView
 
 from ...clients.models import Client
 from .pagination import CustomLimitPagination, CustomPageNumberPagination
@@ -50,6 +52,19 @@ def client_list_api_view(request):
     return Response(serializer.data)
 
 
+class ClientListApiView(APIView):
+    def get(self, request, status=None):
+        
+        if status:
+            clients = Client.objects.filter(status=status)
+            
+
+
+
+
+
+
+
 class ClientListCreateApiView(generics.GenericAPIView, 
                                 mixins.ListModelMixin, 
                                 mixins.CreateModelMixin,
@@ -59,7 +74,7 @@ class ClientListCreateApiView(generics.GenericAPIView,
                                 ):
     queryset = Client.objects.all()
     permission_classes = [AllowAny,]
-    serializer_class = ClientsSerializer
+    serializer_class = ClientSerializer
     lookup_field = "id"
 
     def get(self, request, id=None):
@@ -77,14 +92,25 @@ class ClientListCreateApiView(generics.GenericAPIView,
         return self.destroy(request, id)
 
 
-class ClientListApiView(generics.ListAPIView):
+class ClienGenericsListApiView(generics.ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly,]
     authentication_classes = [TokenAuthentication,]
-    queryset = Client.objects.all().order_by('-created')
+    # queryset = Client.objects.all().order_by('-created')
     serializer_class = ClientSerializer
-    pagination_class = CustomPageNumberPagination
-    filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ['id', 'fname', 'lname', 'email', 'created', 'updated']
+    # pagination_class = CustomPageNumberPagination
+    # filter_backends = [SearchFilter, OrderingFilter]
+    # search_fields = ['id', 'fname', 'lname', 'email', 'created', 'updated']
+    # search_fields = ['lname']
+    # lookup_field = "status"
+
+    def get_queryset(self, request):
+        clients = Client.objects.all()
+        status = request.query_params.get('status')
+        if status:
+            clients= Client.objects.filter(status=status).order_by('-created')
+            print("Status: ", status)
+        return clients
+
 
 
 class ClientViewset(viewsets.ViewSet):

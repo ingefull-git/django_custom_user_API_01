@@ -12,7 +12,7 @@ router.register('model-clients', views.ClientModelViewset, basename='clients-mod
 
 urlpatterns = [
     # path('list', views.client_list_api_view),
-    path('list', views.ClientListApiView.as_view()),
+    path('list', views.ClienGenericsListApiView.as_view()),
     path('list-create', views.client_list_create_view),
     path('generic-list-create', views.ClientListCreateApiView.as_view()),
     # path('<int:pk>/update', views.ClientRetrieveUpdateApiView.as_view()),
