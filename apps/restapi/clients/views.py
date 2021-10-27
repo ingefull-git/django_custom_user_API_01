@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticate
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.views import APIView
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 
 from ...clients.models import Client
 from .pagination import CustomLimitPagination, CustomPageNumberPagination
@@ -52,20 +53,23 @@ def client_list_api_view(request):
     return Response(serializer.data)
 
 
-class ClientListApiView(APIView):
-    def get(self, request, status=None):
-        
+class ClientAPIView(APIView):
+    pagination_class = PageNumberPagination
+
+    def get(self, request):
+        clients = Client.objects.all()
+        status = request.query_params.get('status')
         if status:
             clients = Client.objects.filter(status=status)
-            
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(clients, request)
+        print("Page: ", page)
+        serializer = ClientSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 
 
-
-
-
-
-class ClientListCreateApiView(generics.GenericAPIView, 
+class ClientMixinsApiView(generics.GenericAPIView, 
                                 mixins.ListModelMixin, 
                                 mixins.CreateModelMixin,
                                 mixins.UpdateModelMixin,
@@ -92,7 +96,7 @@ class ClientListCreateApiView(generics.GenericAPIView,
         return self.destroy(request, id)
 
 
-class ClienGenericsListApiView(generics.ListAPIView):
+class ClientGenericsListApiView(generics.ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly,]
     authentication_classes = [TokenAuthentication,]
     # queryset = Client.objects.all().order_by('-created')
