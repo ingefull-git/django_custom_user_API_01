@@ -13,7 +13,8 @@ router.register('model-viewset-clients', views.ClientModelViewset, basename='cli
 urlpatterns = [
     # path('list', views.client_list_api_view),
     path('list-create', views.client_list_create_view),
-    path('apiview-list', views.ClientAPIView.as_view()),
+    path('', views.ClientAPIView.as_view()),
+    path('<int:pk>/', views.ClientAPIView.as_view()),
     path('generics-list', views.ClientGenericsListApiView.as_view()),
     path('generics-mixins', views.ClientMixinsApiView.as_view()),
     # path('<int:pk>/update', views.ClientRetrieveUpdateApiView.as_view()),
