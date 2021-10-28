@@ -34,7 +34,7 @@ def client_list_create_view(request):
         if serializer.is_valid():
             serializer.save()
             # return JsonResponse(serializer.data, status=201)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         # return JsonResponse(serializer.errors, status=400)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     clients = Client.objects.all()
@@ -56,17 +56,49 @@ def client_list_api_view(request):
 class ClientAPIView(APIView):
     pagination_class = PageNumberPagination
 
-    def get(self, request):
-        clients = Client.objects.all()
-        status = request.query_params.get('status')
-        if status:
-            clients = Client.objects.filter(status=status)
-        paginator = self.pagination_class()
-        page = paginator.paginate_queryset(clients, request)
-        print("Page: ", page)
-        serializer = ClientSerializer(page, many=True)
-        return paginator.get_paginated_response(serializer.data)
+    def get_object(self, pk):
+        try:
+            # client = Client.objects.get(pk=pk)
+            client = get_object_or_404(Client, pk=pk)
+            return client
+        except Client.DoesNotExist:
+            return Response(status = status.HTTP_304_NOT_MODIFIED)
 
+    def get(self, request, pk=None):
+        if pk:
+            query = self.get_object(pk)
+            serializer = ClientSerializer(query)
+            return Response(serializer.data)
+        else:
+            query = Client.objects.all()
+            status = request.query_params.get('status')
+            if status:
+                query = Client.objects.filter(status=status)
+            paginator = self.pagination_class()
+            page = paginator.paginate_queryset(query, request)
+            serializer = ClientSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        
+
+    def post(self, request):
+        serializer = ClientSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, pk):
+        client = self.get_object(pk)
+        serializer = ClientSerializer(client, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        client = self.get_object(pk)
+        client.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ClientMixinsApiView(generics.GenericAPIView, 

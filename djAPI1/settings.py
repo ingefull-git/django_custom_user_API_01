@@ -163,7 +163,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     # 'DEFAULT_APAGINATION_CLASSE': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 1,
+    'PAGE_SIZE': 2,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
