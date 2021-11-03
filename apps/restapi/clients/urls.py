@@ -21,4 +21,5 @@ urlpatterns = [
     path('<int:pk>/update', views.client_retieve_update_api_view),
     path('<int:pk>/detail', views.client_retrieve_update_delete_view),
     path('viewset/', include(router.urls)),
+    path('customclients/<str:created>/', views.ClientCustomAPIView.as_view()),
 ]
