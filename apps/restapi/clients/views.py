@@ -178,6 +178,26 @@ class ClientViewset(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class ClientCustomAPIView(APIView):
+    serializer_class = ClientSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self, created):
+        clients = Client.objects.filter(created__date=created)
+        status = self.request.query_params.get('status')
+        if status:
+            query = clients.filter(status=status)
+            return query
+        return clients
+
+    def get(self, request, created):
+        clients = self.get_queryset(created)
+        if clients:
+            serializer = self.serializer_class(clients, many=True)
+            return Response(serializer.data)
+        return Response({'status':'Error no clients..!!'})
+
+
 class ClientGenericViewset(viewsets.GenericViewSet, mixins.ListModelMixin):
     serializer_class = ClientSerializer
     queryset = Client.objects.all()
