@@ -1,7 +1,7 @@
-from cgitb import lookup
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
+from django.db.models import Count, Q
 
 from rest_framework.parsers import JSONParser
 from rest_framework import generics, status, mixins
@@ -183,16 +183,46 @@ class ClientCustomAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self, created):
-        clients = Client.objects.filter(created__date=created)
-        status = self.request.query_params.get('status')
-        if status:
-            query = clients.filter(status=status)
-            return query
-        return clients
+        # clients = Client.objects.filter(created__date=created).values('status').distinct()
+        # clients = Client.objects.filter(created__date=created).annotate(Count('status', distinct=True)).distinct().order_by('status')
+        result = []
+        statuses = Client.objects.values('pk').filter(created__date=created).values_list('status', flat=True).distinct()
+        clients = Client.objects.values('pk').filter(created__date=created).values('status')
+        # clients = Client.objects.raw('SELECT DISTINCT ("clients_client"."status"), "clients_client"."id" FROM "clients_client" WHERE django_datetime_cast_date("clients_client"."created", "UTC", "UTC") = 2021-10-19 GROUP BY "clients_client"."status"')
+        # clients = Client.objects.raw('SELECT DISTINCT ("clients_client"."status"), "clients_client"."id" FROM "clients_client" GROUP BY "clients_client"."status" ')
+        for client in clients:
+            print("Client: ", client)
+        # statuses = Client.objects.filter(created__date=created).values_list('status').distinct().annotate(cant=Count('pk'))
+        # print("Status: ", statuses)
+        print("Clients: ", clients)
+        # print("QueryDesc: ", statuses.query)
+        print("QueryDesc: ", clients.query)
+        # statuses = Client.objects.filter(created__date=created).values_list('status', flat=True).distinct()
+        # for stat in statuses:
+        #     print("Stat: ", stat)
+        #     clients = Client.objects.filter(created__date=created, status=stat).order_by('pk')
+        #     print("Clients:>>> ", clients)
+        #     result.append(clients[0])
+            
+        # clients = Client.objects.filter(created__date=created).values('status').annotate(Count('status'))
+        # clients = Client.objects.filter(created__date=created).annotate(Count('status', distinct=True))
+        # clients = Client.objects.filter(created__date=created).filter(status__in=[1,2,3,4]).group_by('status').distinct()
+        
+        # print("Result: ", result)
+        # print("")
+        # print("Statuses: ", statuses)
+        # for q in range(len(result)):
+        #     print("client: ", result[q])
+        # status = self.request.query_params.get('status')
+        # if status:
+        #     query = clients.filter(status=status)
+        #     return query
+        return result
 
     def get(self, request, created):
         clients = self.get_queryset(created)
         if clients:
+            print("CLIENTS: ", clients)
             serializer = self.serializer_class(clients, many=True)
             return Response(serializer.data)
         return Response({'status':'Error no clients..!!'})
