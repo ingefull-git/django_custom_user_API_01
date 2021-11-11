@@ -1,15 +1,17 @@
 from django.contrib import admin
-from apps.clients.models import Client
+from apps.clients.models import Client, Invoice
+
 
 
 class CustomClientAdmin(admin.ModelAdmin):
-    list_display = ('id', 'fname', 'lname', 'email', 'status', 'created', 'updated')
-    list_display_links = ('id', 'lname')
+    list_display = ('id', 'psid', 'fname', 'lname', 'email', 'status', 'created', 'updated')
+    list_display_links = ('id', 'psid', 'lname')
     ordering = ('-created', 'lname')
-    search_fields = ('id', 'fname', 'lname', 'email', 'status')
-    list_filter = ('id', 'fname', 'lname', 'email', 'status', 'created', 'updated')
+    search_fields = ('id', 'psid', 'fname', 'lname', 'email', 'status')
+    list_filter = ('id', 'psid', 'fname', 'lname', 'email', 'status', 'created', 'updated')
     readonly_fields = ('created', 'updated')
 
 
 admin.site.register(Client, CustomClientAdmin)
+admin.site.register(Invoice)
 
