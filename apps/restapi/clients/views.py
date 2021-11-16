@@ -208,15 +208,6 @@ class ClientCustomAPIView(APIView):
         # clients = Client.objects.filter(created__date=created).annotate(Count('status', distinct=True))
         # clients = Client.objects.filter(created__date=created).filter(status__in=[1,2,3,4]).group_by('status').distinct()
         
-        # print("Result: ", result)
-        # print("")
-        # print("Statuses: ", statuses)
-        # for q in range(len(result)):
-        #     print("client: ", result[q])
-        # status = self.request.query_params.get('status')
-        # if status:
-        #     query = clients.filter(status=status)
-        #     return query
         return result
 
     def get(self, request, created):
