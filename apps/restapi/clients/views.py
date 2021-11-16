@@ -179,6 +179,7 @@ class ClientViewset(viewsets.ViewSet):
 
 
 class ClientCustomAPIView(APIView):
+    ''' add comment to the endpoint for swagger'''
     serializer_class = ClientSerializer
     permission_classes = [IsAuthenticated]
 
