@@ -162,13 +162,13 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    # 'DEFAULT_APAGINATION_CLASSE': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 2,
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.AllowAllUsersModelBackend',
+    # 'django.contrib.auth.backends.AllowAllUsersModelBackend',
     'apps.customuser.backends.CaseInsensitiveModelBackend',
     # 'django.contrib.auth.backends.ModelBackend',
 #     'allauth.account.auth_backends.AuthenticationBackend',
