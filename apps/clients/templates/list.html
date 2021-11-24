@@ -11,5 +11,13 @@
         Salir
     </a>
     <h1>Hello World..!!!</h1>
+    <h1></h1>
+    {% for stat in status %}
+    <h5>{{stat}} / {{stat.label}} / {{stat.value}} / {{stat.name}}</h5>
+    {% endfor %}
+    <h1></h1>
+    {% for inv in invoices %}
+    <h5>{{inv.code}} / {{inv.client}}</h5>
+    {% endfor %}
 </body>
 </html>
