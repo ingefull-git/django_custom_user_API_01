@@ -1,7 +1,7 @@
 from django.db import connection
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from apps.clients.models import Client, Status
+from apps.clients.models import Client, Invoice, Status
 
 
 def dictfetchall(cursor):
@@ -22,6 +22,7 @@ def clients_list_view(request):
     clients = dictfetchall(cursor)
     print("Cursor Clients: ", clients)
     context = {
-        'status': status
+        'status': status,
+        'invoices': invoices
     }
     return render(request, 'list.html', context)

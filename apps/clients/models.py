@@ -7,7 +7,7 @@ class Status(models.TextChoices):
         ERROR = 3, "Error"
 
 class Client(models.Model):
-
+    psid        = models.CharField(max_length=10, unique=True, blank=True, null=True)
     fname       = models.CharField(verbose_name="first name", max_length=100, blank=True, null=True)
     lname       = models.CharField(verbose_name="last name", max_length=100, blank=False, null=False)
     email       = models.EmailField(verbose_name="email", blank=False, null=False)
@@ -21,3 +21,22 @@ class Client(models.Model):
 
     def __str__(self):
         return self.fullname
+
+class Invoice(models.Model):
+
+    code        = models.CharField(max_length=10, blank=True, unique=True)
+    client      = models.ForeignKey(Client, on_delete=models.CASCADE)
+    date        = models.DateField(auto_now=True)
+    amount      = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
+
+    def __str__(self):
+        return self.code
+    
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            super().save(None)
+            number = f'{self.pk:06}'
+            self.code = "INV-" + number
+        super().save(*args, **kwargs)
+
+
