@@ -13,14 +13,13 @@ def dictfetchall(cursor):
 
 @login_required
 def clients_list_view(request):
-    status = [stat for stat in Status.labels]
+    status = [stat for stat in Status.choices]
     print("Status: ", status)
-    clients = Client.objects.all()
-    print("Clients All: ", clients.values())
+    # clients = Client.objects.all()
     cursor = connection.cursor()
     cursor.execute("SELECT clients_client.status, COUNT(clients_client.id) AS cant FROM clients_client GROUP BY clients_client.status")
     clients = dictfetchall(cursor)
-    print("Cursor Clients: ", clients)
+    invoices = Invoice.objects.all()
     context = {
         'status': status,
         'invoices': invoices
