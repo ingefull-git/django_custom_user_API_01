@@ -1,13 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-     <a class="nav-item nav-link ml-4" href="{% url 'authuser:logout-view' %}">
+{% extends "base.html" %}
+
+
+{% block content %}
+
+    <a class="nav-item nav-link ml-4" href="{% url 'authuser:logout-view' %}">
         Salir
     </a>
     <h1>Hello World..!!!</h1>
@@ -19,5 +15,5 @@
     {% for inv in invoices %}
     <h5>{{inv.code}} / {{inv.client}}</h5>
     {% endfor %}
-</body>
-</html>
+
+{% endblock content %}
